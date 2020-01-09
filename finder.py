@@ -97,7 +97,7 @@ class Finder():
     COUTNERS
     ======================================================================
     """
-    def count_files_types(self) -> dict:
+    def count_file_types(self) -> dict:
         """
         Returns the number of files types inside of a directory
         """
