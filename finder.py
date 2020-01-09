@@ -1,5 +1,6 @@
 import os
 from collections import Counter
+from tqdm import tqdm, trange
 
 class Finder():
     """
@@ -8,19 +9,24 @@ class Finder():
     """
     __version__ = '0.0.1'
 
+
     def __init__(self, starting_directory: str):
         
         assert os.access(starting_directory, 0), \
             'Starting Directory must be accessable.'
         self.starting_directory = starting_directory
+        self.num_child_directories = len(next(os.walk(starting_directory))[1])
+        self.num_child_files = len(next(os.walk(starting_directory))[2])
 
     """
     FINDERS
     ======================================================================
     """
 
+    
+
     def find_file_type(self, file_extension = '.pdf', 
-        full_path = False) -> list:
+        full_path = False, disable_progress = False) -> list:
         """
         Takes in the file extension and then walks the child directories from the starting point in order to find 
         the files with the ending extension.
@@ -34,13 +40,24 @@ class Finder():
 
         results = []
 
+        child_directories = next(os.walk(self.starting_directory))[1]
+
         # Walk through the file tree for the given directory 
+
+        progress = -1
+
         for root, _, files in os.walk(self.starting_directory):
+
+            current_dir = child_directories[progress]
+            if current_dir not in root:
+                progress += 1
+            print(f">>> Searched {progress + 1}/{len(child_directories)} files      ", end='\r', flush=True)
+
+
             # Check if current child directory is accessable, if not print that it is not then move on. 
             if not os.access(root, os.R_OK):
                 print(f"{root} is not accessable... Skipping")
                 pass
-
 
             # Iterate through the files in the current directory 
             for f in files:
@@ -52,6 +69,8 @@ class Finder():
                     else: 
                         results.append(f)
 
+        # Extra print statement to keep the final progress text
+        print('')
         return results
 
     def find_directories(self, folder_names: list, full_path = True) -> list:
