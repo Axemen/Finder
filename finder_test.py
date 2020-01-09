@@ -4,36 +4,65 @@ from pathlib import Path
 finder = Finder(Path(r'testing_dir'))
 
 """
-Test for the find_file_type function of the Finder class.
-
-Expected output should be the file names and then their paths. 
+TESTING Finder.find_file_type()
+==================================================================
 """
-# print(finder.find_file_type('.pdf'))
-# print(finder.find_file_type('.pdf', full_path=True))
+assert finder.find_file_type('.pdf') == ['test1.pdf',
+                                        'test2.pdf',
+                                        'test1.pdf',
+                                        'test2.pdf',
+                                        'test1.pdf',
+                                        'test2.pdf',
+                                        'test1.pdf',
+                                        'test2.pdf']
 
 """
-Test for the find_direcory funciton in the Finder class
-
-Expected output should be the folder names, then the folder paths. 
+TESTING Finder.find_directories()
+==================================================================
 """
-print('Test one: folder_name = ["LGL"], full_path = False \n')
-print(finder.find_directory(
-    folder_names = ['LGL']
-))
+assert finder.find_directories(['AFT']) == ['testing_dir\\AFT']
+assert finder.find_directories(['AFT', 'HRM']) == ['testing_dir\\AFT',
+                                                    'testing_dir\\HRM']
 
-print('Test two: folder_name = ["LGL", "HRM"], full_path = False \n')
-print(finder.find_directory(
-    folder_names = ['LGL', 'HRM']
-))
+"""
+TESTING Finder.find_files()
+==================================================================
+"""
+assert finder.find_files() == ['test1.pdf',
+                                'test1.txt',
+                                'test2.pdf',
+                                'test2.txt',
+                                'test1.pdf',
+                                'test1.txt',
+                                'test2.pdf',
+                                'test2.txt',
+                                'test1.pdf',
+                                'test1.txt',
+                                'test2.pdf',
+                                'test2.txt',
+                                'test1.pdf',
+                                'test1.txt',
+                                'test2.pdf',
+                                'test2.txt']
 
-print('Test three: folder_name = ["LGL"], full_path = True \n')
-print(finder.find_directory(
-    folder_names = ['LGL'],
-    full_path=True
-))
+"""
+TESTING Finder.count_file_types()
+==================================================================
+"""
+assert finder.count_files_types() == {'pdf': 8, 'txt': 8}
 
-print('Test three: folder_name = ["LGL", "HRM"], full_path = True \n')
-print(finder.find_directory(
-    folder_names = ['LGL', 'HRM'],
-    full_path=True
-))
+"""
+TESTING Finder.count_files()
+==================================================================
+"""
+
+assert finder.count_files() is 16
+
+"""
+TESTING Finder.count_directories()
+==================================================================
+"""
+assert finder.count_directories() == 12
+
+
+print('Success')

@@ -37,7 +37,6 @@ class Finder():
         # Walk through the file tree for the given directory 
         for root, _, files in os.walk(self.starting_directory):
             # Check if current child directory is accessable, if not print that it is not then move on. 
-            print(root)
             if not os.access(root, os.R_OK):
                 print(f"{root} is not accessable... Skipping")
                 pass
@@ -55,7 +54,7 @@ class Finder():
 
         return results
 
-    def find_directory(self, folder_names: list, full_path = True) -> list:
+    def find_directories(self, folder_names: list, full_path = True) -> list:
         """
         Returns a list of the folders inside of the starting_directory that are inside of the folder_names list
 
