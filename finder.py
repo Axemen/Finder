@@ -1,6 +1,6 @@
-import os
+from os import walk, path, access
 from collections import Counter
-from tqdm import tqdm, trange
+from datetime import datetime
 
 class Finder():
     """
@@ -10,23 +10,25 @@ class Finder():
     __version__ = '0.0.1'
 
 
-    def __init__(self, starting_directory: str):
+    def __init__(self, starting_directory:str = None):
         
-        assert os.access(starting_directory, 0), \
-            'Starting Directory must be accessable.'
-        self.starting_directory = starting_directory
-        self.num_child_directories = len(next(os.walk(starting_directory))[1])
-        self.num_child_files = len(next(os.walk(starting_directory))[2])
+        if starting_directory is not None:  
+            assert access(starting_directory, 0), \
+                                                        'Starting Directory must be accessable.'
+            self.starting_directory = starting_directory
+        else:
+            self.starting_directory = None
 
     """
     FINDERS
     ======================================================================
     """
 
-    
+    def find_file_type(self, 
+        file_extension = '.pdf', 
+        full_path = False, 
+        starting_directory:str = None) -> list:
 
-    def find_file_type(self, file_extension = '.pdf', 
-        full_path = False, disable_progress = False) -> list:
         """
         Takes in the file extension and then walks the child directories from the starting point in order to find 
         the files with the ending extension.
@@ -37,25 +39,18 @@ class Finder():
         full_path: a boolean value to determine weather to just find the file or return the full path 
             to the file from the starting_directory
         """
+        if starting_directory is None: 
+            starting_directory = self.starting_directory
+        assert starting_directory is not None, "starting_directory must be set"
+
 
         results = []
 
-        child_directories = next(os.walk(self.starting_directory))[1]
-
         # Walk through the file tree for the given directory 
-
-        progress = -1
-
-        for root, _, files in os.walk(self.starting_directory):
-
-            current_dir = child_directories[progress]
-            if current_dir not in root:
-                progress += 1
-            print(f">>> Searched {progress + 1}/{len(child_directories)} files      ", end='\r', flush=True)
-
+        for root, _, files in walk(self.starting_directory):
 
             # Check if current child directory is accessable, if not print that it is not then move on. 
-            if not os.access(root, os.R_OK):
+            if not access(root, R_OK):
                 print(f"{root} is not accessable... Skipping")
                 pass
 
@@ -73,7 +68,7 @@ class Finder():
         print('')
         return results
 
-    def find_directories(self, folder_names: list, full_path = True) -> list:
+    def find_directories(self, folder_names:str, full_path = True, starting_directory:str = None) -> list:
         """
         Returns a list of the folders inside of the starting_directory that are inside of the folder_names list
 
@@ -83,32 +78,58 @@ class Finder():
         full_path: a boolean value to determine weather to just find the file or return the full path 
             to the file from the starting_directory
         """
+        if starting_directory is None: starting_directory = self.starting_directory
+        assert starting_directory is not None, "starting_directory must be set"
 
         results = []
+        progress = -1
+        child_directories = next(walk(self.starting_directory))[1]
+        start = datetime.now()
 
-        for root, dirs, _ in os.walk(self.starting_directory):
+        for root, dirs, _ in walk(self.starting_directory):
+
+            current_dir = child_directories[progress]
+            if current_dir not in root:
+                progress += 1
+            print(f">>> Searched {progress + 1}/{len(child_directories)} files... Time elapsed {datetime.now() - start}      ", 
+                    end='\r', flush=False)
+
             # Iterate through the child directories checking if the folder names match.
             for ch in dirs:
-                if ch in folder_names:
+                if ch == folder_names:
                     # Check for the full path argument and append to results accordingly
                     if full_path: 
                         results.append(root + '\\' + ch)
                     else: 
                         results.append(ch)
+        print('')
         return results
 
-    def find_files(self, full_path = False) -> list:
+    def find_files(self, full_path = False, starting_directory:str = None) -> list:
         """
-        Finds all files inside of the starting directory and returns them in a list. w
+        Finds all files inside of the starting directory and returns them in a list. 
         """
+        if starting_directory is None: starting_directory = self.starting_directory
+        assert starting_directory is not None, "starting_directory must be set"
+
+        progress = -1
         results = []
-        for root, _, files in os.walk(self.starting_directory):
+        child_directories = next(walk(starting_directory))[1]
+
+        for root, _, files in walk(starting_directory):
+
+            current_dir = child_directories[progress]
+            if current_dir not in root:
+                progress += 1
+            print(f">>> Searched {progress + 1}/{len(child_directories)} files      ", end='\r', flush=False)
+
             for f in files:
                 if full_path: 
                     results.append(root + '\\' + f)
                 else: 
                     results.append(f)
-
+        
+        print('')
         return results
 
 
@@ -122,7 +143,7 @@ class Finder():
         """
         file_counter = Counter()
         
-        for _, _, files in os.walk(self.starting_directory):
+        for _, _, files in walk(self.starting_directory):
             for f in files:
                 # returns the file extension by splitting on periods and then grabbing the last element in the returned list
                 extension = f.split('.')[-1] 
@@ -135,7 +156,7 @@ class Finder():
         Returns the number of files inside of a directory and it's children. 
         """
         num_files = 0
-        for _, _, files in os.walk(self.starting_directory):
+        for _, _, files in walk(self.starting_directory):
             num_files += len(files)
 
         return num_files
@@ -147,7 +168,7 @@ class Finder():
         """
 
         num_dirs = 0
-        for _, dirs, _ in os.walk(self.starting_directory):
+        for _, dirs, _ in walk(self.starting_directory):
             num_dirs += len(dirs)
 
         return num_dirs

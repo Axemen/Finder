@@ -1,5 +1,6 @@
 from finder import Finder
 from pathlib import Path
+from datetime import datetime
 
 # finder = Finder(Path(r'testing_dir'))
 
@@ -28,7 +29,7 @@ from pathlib import Path
 # TESTING Finder.find_files()
 # ==================================================================
 # """
-# assert finder.find_files() == ['test1.pdf',
+# assert finder.find_file() == ['test1.pdf',
 #                                 'test1.txt',
 #                                 'test2.pdf',
 #                                 'test2.txt',
@@ -69,6 +70,12 @@ from pathlib import Path
 
 
 
-finder = Finder(r'A:\Projects\NA02\C646 - Gorgon LNG Project\Archive')
+finder = Finder(r'A:\Projects\NA')
 
-print(finder.find_file_type('.pdf'))
+dirs = finder.find_directories('HRM')
+
+# files = []
+# start = datetime.now()
+
+# for d in dirs:
+#     files.append(finder.find_file_type('.pdf'))
