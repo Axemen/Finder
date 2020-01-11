@@ -1,6 +1,7 @@
-from os import walk, path, access
+from os import walk, path, R_OK, access
 from collections import Counter
 from datetime import datetime
+from typing import Generator
 
 class Finder():
     """
@@ -8,7 +9,6 @@ class Finder():
     through directories and find the requested files and their paths. 
     """
     __version__ = '0.0.1'
-
 
     def __init__(self, starting_directory:str = None):
         
@@ -43,7 +43,6 @@ class Finder():
             starting_directory = self.starting_directory
         assert starting_directory is not None, "starting_directory must be set"
 
-
         results = []
 
         # Walk through the file tree for the given directory 
@@ -64,10 +63,30 @@ class Finder():
                     else: 
                         results.append(f)
 
-        # Extra print statement to keep the final progress text
-        print('')
         return results
 
+    def find_file_type_gen(self, 
+        file_extension = '.pdf', 
+        full_path = False, 
+        starting_directory:str = None) -> Generator:
+
+        for root, _, files in walk(self.starting_directory):
+
+            # Check if current child directory is accessable, if not print that it is not then move on. 
+            if not access(root, R_OK):
+                print(f"{root} is not accessable... Skipping")
+                pass
+
+            # Iterate through the files in the current directory 
+            for file_name in files:
+                # Check the file extension of the file currently being iterated over
+                if f.endswith(file_extension):
+                    # Check weather or not to print out the full path. 
+                    if full_path: 
+                        yield root + '\\' + file_name
+                    else: 
+                        yield file_name
+    
     def find_directories(self, folder_names:str, full_path = True, starting_directory:str = None) -> list:
         """
         Returns a list of the folders inside of the starting_directory that are inside of the folder_names list
@@ -82,18 +101,8 @@ class Finder():
         assert starting_directory is not None, "starting_directory must be set"
 
         results = []
-        progress = -1
-        child_directories = next(walk(self.starting_directory))[1]
-        start = datetime.now()
 
         for root, dirs, _ in walk(self.starting_directory):
-
-            current_dir = child_directories[progress]
-            if current_dir not in root:
-                progress += 1
-            print(f">>> Searched {progress + 1}/{len(child_directories)} files... Time elapsed {datetime.now() - start}      ", 
-                    end='\r', flush=False)
-
             # Iterate through the child directories checking if the folder names match.
             for ch in dirs:
                 if ch == folder_names:
@@ -102,7 +111,6 @@ class Finder():
                         results.append(root + '\\' + ch)
                     else: 
                         results.append(ch)
-        print('')
         return results
 
     def find_files(self, full_path = False, starting_directory:str = None) -> list:
@@ -112,17 +120,7 @@ class Finder():
         if starting_directory is None: starting_directory = self.starting_directory
         assert starting_directory is not None, "starting_directory must be set"
 
-        progress = -1
-        results = []
-        child_directories = next(walk(starting_directory))[1]
-
         for root, _, files in walk(starting_directory):
-
-            current_dir = child_directories[progress]
-            if current_dir not in root:
-                progress += 1
-            print(f">>> Searched {progress + 1}/{len(child_directories)} files      ", end='\r', flush=False)
-
             for f in files:
                 if full_path: 
                     results.append(root + '\\' + f)
