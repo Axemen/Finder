@@ -1,182 +1,48 @@
-from os import walk, path, R_OK, access
-from collections import Counter
-from datetime import datetime
-from typing import Generator
+import glob
+from typing import List, Tuple, Generator
+from pathlib import Path
+import os
+"""
+A collection of common uses from the glob library wrapped in easy to use functions.
+"""
 
-class Finder():
+def find_file_by_extension(root: str, extension: str, recursive = False) -> List:
     """
-    The Dir_crawler class is a wrapper for scripts that will search 
-    through directories and find the requested files and their paths. 
+    root: the root directory to search within.
+    extension: the file extension to search for.
+    recursive: Weather or not you wish to search sub-directories as well. 
     """
-    __version__ = '0.0.1'
+    return glob.glob(f"{root}**/*{extension}")
 
-    def __init__(self, starting_directory:str = None):
-        
-        if starting_directory is not None:  
-            assert access(starting_directory, 0), \
-                                                        'Starting Directory must be accessable.'
-            self.starting_directory = starting_directory
-        else:
-            self.starting_directory = None
-
+def find_file_by_name(root:str, file_name:str, recursive = False) -> List:
     """
-    FINDERS
-    ======================================================================
+    root: the root directory to search within.
+    file_name: the name of the file you wish to search for. 
+    recursive: Weather or not you wish to search sub-directories as well. 
     """
+    return glob.glob(f"{root}**/{file_name}.*")
 
-    def find_file_type(self, 
-        file_extension = '.pdf', 
-        full_path = False, 
-        starting_directory:str = None) -> list:
-
-        """
-        Takes in the file extension and then walks the child directories from the starting point in order to find 
-        the files with the ending extension.
-
-        Parameters
-        --------------------------------
-        file_extension: a string of the file extension (ex '.pdf', '.csv', '.xls')
-        full_path: a boolean value to determine weather to just find the file or return the full path 
-            to the file from the starting_directory
-        """
-        if starting_directory is None: 
-            starting_directory = self.starting_directory
-        assert starting_directory is not None, "starting_directory must be set"
-
-        results = []
-
-        # Walk through the file tree for the given directory 
-        for root, _, files in walk(self.starting_directory):
-
-            # Check if current child directory is accessable, if not print that it is not then move on. 
-            if not access(root, R_OK):
-                print(f"{root} is not accessable... Skipping")
-                pass
-
-            # Iterate through the files in the current directory 
-            for f in files:
-                # Check the file extension of the file currently being iterated over
-                if f.endswith(file_extension):
-                    # Check weather or not to print out the full path. 
-                    if full_path: 
-                        results.append(root + '\\' + f)
-                    else: 
-                        results.append(f)
-
-        return results
-
-    def find_file_type_gen(self, 
-        file_extension = '.pdf', 
-        full_path = False, 
-        starting_directory:str = None) -> Generator:
-
-        for root, _, files in walk(self.starting_directory):
-
-            # Check if current child directory is accessable, if not print that it is not then move on. 
-            if not access(root, R_OK):
-                print(f"{root} is not accessable... Skipping")
-                pass
-
-            # Iterate through the files in the current directory 
-            for file_name in files:
-                # Check the file extension of the file currently being iterated over
-                if f.endswith(file_extension):
-                    # Check weather or not to print out the full path. 
-                    if full_path: 
-                        yield root + '\\' + file_name
-                    else: 
-                        yield file_name
-    
-    def find_directories(self, folder_names:str, full_path = True, starting_directory:str = None) -> list:
-        """
-        Returns a list of the folders inside of the starting_directory that are inside of the folder_names list
-
-        Parameters
-        -----------------------
-        folder_names: list of the folder names to check for in the directory
-        full_path: a boolean value to determine weather to just find the file or return the full path 
-            to the file from the starting_directory
-        """
-        if starting_directory is None: starting_directory = self.starting_directory
-        assert starting_directory is not None, "starting_directory must be set"
-
-        results = []
-
-        for root, dirs, _ in walk(self.starting_directory):
-            # Iterate through the child directories checking if the folder names match.
-            for ch in dirs:
-                if ch == folder_names:
-                    # Check for the full path argument and append to results accordingly
-                    if full_path: 
-                        results.append(root + '\\' + ch)
-                    else: 
-                        results.append(ch)
-        return results
-
-    def find_files(self, full_path = False, starting_directory:str = None) -> list:
-        """
-        Finds all files inside of the starting directory and returns them in a list. 
-        """
-        if starting_directory is None: starting_directory = self.starting_directory
-        assert starting_directory is not None, "starting_directory must be set"
-
-        for root, _, files in walk(starting_directory):
-            for f in files:
-                if full_path: 
-                    results.append(root + '\\' + f)
-                else: 
-                    results.append(f)
-        
-        print('')
-        return results
-
-
+def find_all_files(root:str, recursive = False) -> List:
     """
-    COUTNERS
-    ======================================================================
+    root: the root directory to search within.
+    recursive: Weather or not you wish to search sub-directories as well. 
     """
-    def count_file_types(self) -> dict:
-        """
-        Returns the number of files types inside of a directory
-        """
-        file_counter = Counter()
-        
-        for _, _, files in walk(self.starting_directory):
-            for f in files:
-                # returns the file extension by splitting on periods and then grabbing the last element in the returned list
-                extension = f.split('.')[-1] 
-                file_counter[extension] += 1
+    return glob.glob(f"{root}**/*.*")
 
-        return dict(file_counter)
-
-    def count_files(self) -> int:
-        """
-        Returns the number of files inside of a directory and it's children. 
-        """
-        num_files = 0
-        for _, _, files in walk(self.starting_directory):
-            num_files += len(files)
-
-        return num_files
-
-    def count_directories(self) -> int:
-        """
-        Returns the number of directories nested inside of the 
-        starting directory. 
-        """
-
-        num_dirs = 0
-        for _, dirs, _ in walk(self.starting_directory):
-            num_dirs += len(dirs)
-
-        return num_dirs
-
+def find_directory_by_name(root:str, directory_name: str, recursive = False) -> List:
     """
-    GETTERS AND SETTERS
-    ======================================================================
+    root: the root directory to search within.
+    directory_name: The name of the directory(ies) you wish to find
+    recursive: Weather or not you wish to search sub-directories as well. 
     """
-    def set_starting_dir(self, starting_directory: str) -> None:
-        self.starting_directory = starting_directory
+    return glob.glob(f"{root}**/{directory_name}/")
 
-    def get_starting_dir(self) -> str:
-        return self.starting_directory
+def find_all_directories(root:str, recursive = False) -> List:
+    """
+    root: the root directory to search within.
+    recursive: Weather or not you wish to search sub-directories as well. 
+    """
+    return glob.glob(f"{root}**/")
+
+def find_files_with_folder_in_path(root: str, folder_in_path:str, file_name:str):
+    return glob.glob(f'{root}**/{folder_in_path}/**/{file_name}.*')
