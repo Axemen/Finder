@@ -1,0 +1,6 @@
+README.md
+setup.py
+ez_glob.egg-info/PKG-INFO
+ez_glob.egg-info/SOURCES.txt
+ez_glob.egg-info/dependency_links.txt
+ez_glob.egg-info/top_level.txt

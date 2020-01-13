@@ -4,13 +4,13 @@ with open("README.md", 'r') as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name = 'finder-pkg-Axemen',
+    name = 'ez-glob',
     version = '0.0.1',
     author = 'Jonathan Randolph',
     author_email='Jrandolph011@gmail.com',
     description='A small package for finding files and directories',
     long_description_content_type="text/markdown",
-    url = 'https://github.com/Axemen/Finder',
+    url = 'https://github.com/Axemen/ez-glob',
     packages = setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
