@@ -5,36 +5,60 @@ import os
 A collection of common uses from the glob library wrapped in easy to use functions.
 """
 # TODO All iglob functions as well.
-# TODO Rethink function names for easier understanding. 
-# TODO Work on coagulation of funcitons into two meta functions for file and directories. 
 
-def find_file_by_extension(root: str, extension: str, recursive = False) -> List:
+def find_files(root:str, file_name = '**', file_extension = '*', folder_in_path = '**', recursive = False) -> List:
     """
-    root: the root directory to search within.
-    extension: the file extension to search for.
-    recursive: Weather or not you wish to search sub-directories as well. 
-    """
-    return glob(f"{root}**/*{extension}", recursive = recursive)
+    find files with the specified parameters. 
 
-def find_file_by_name(root:str, file_name:str, recursive = False) -> List:
-    """
-    root: the root directory to search within.
-    file_name: the name of the file you wish to search for. 
-    recursive: Weather or not you wish to search sub-directories as well. 
-    """
-    return glob(f"{root}**/{file_name}.*", recursive = recursive)
+    Returns a list with complete paths to the files. 
 
-def find_directory_by_name(root:str, directory_name: str, recursive = False) -> List:
+    PARAMS:
+        root: The top-level directory from which to start the search. 
+        file_name: The name of the file(s) to search for. 
+        folder_in_path: A folder that appears at any point within the file's path. 
+        recursive: Weather or not to perform the search within child_directories as well. 
+
     """
-    root: the root directory to search within.
-    directory_name: The name of the directory(ies) you wish to find
-    recursive: Weather or not you wish to search sub-directories as well. 
+    return glob(f"{root}**/{folder_in_path}/{file_name}.{file_extension}", recursive = recursive)
+
+def find_directories(root:str, folder_name = "*", folder_in_path = "**", recursive = False) -> List:
     """
-    return glob(f"{root}**/{directory_name}/", recursive = recursive)
+    find files with the specified parameters. 
 
+    Returns a list with complete paths to the folders.
 
-def find_files(root:str, file_name = '**', file_extension = '*', folder_name = '**', recursive = False):
-    return glob(f"{root}**/{folder_name}/{folder_name}.{file_extension}", recursive = recursive)
-
-def find_directories(root:str, folder_name = "*", folder_in_path = "**", recursive = False):
+    PARAMS:
+        root: The top-level directory from which to start the search. 
+        folder_name: The name of the folder(s) to search for. 
+        folder_in_path: A folder that appears at any point within the file's path. 
+        recursive: Weather or not to perform the search within child_directories as well. 
+    """
     return glob(f"{root}**/{folder_in_path}/**/{folder_name}/", recursive=recursive)
+
+def ifind_files(root:str, file_name = '**', file_extension = '*', folder_name = '**', recursive = False) -> Generator:
+    """
+    find files with the specified parameters. 
+
+    Returns a generator that produces the full paths to the files. 
+
+    PARAMS:
+        root: The top-level directory from which to start the search. 
+        file_name: The name of the file(s) to search for. 
+        folder_in_path: A folder that appears at any point within the file's path. 
+        recursive: Weather or not to perform the search within child_directories as well. 
+    """
+    return iglob(f"{root}**/{folder_name}/{folder_name}.{file_extension}", recursive = recursive)
+
+def ifind_directories(root:str, folder_name = "*", folder_in_path = "**", recursive = False) -> Generator:
+    """
+    find files with the specified parameters. 
+
+    Returns a generator that produces the full paths to the files. 
+
+    PARAMS:
+        root: The top-level directory from which to start the search. 
+        folder_name: The name of the folder(s) to search for. 
+        folder_in_path: A folder that appears at any point within the file's path. 
+        recursive: Weather or not to perform the search within child_directories as well. 
+    """
+    return iglob(f"{root}**/{folder_in_path}/**/{folder_name}/", recursive=recursive)
