@@ -1,0 +1,6 @@
+README.md
+setup.py
+finder_pkg_Axemen.egg-info/PKG-INFO
+finder_pkg_Axemen.egg-info/SOURCES.txt
+finder_pkg_Axemen.egg-info/dependency_links.txt
+finder_pkg_Axemen.egg-info/top_level.txt
