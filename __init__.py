@@ -1,2 +1,2 @@
-from .finder import Finder
+import finder
 
